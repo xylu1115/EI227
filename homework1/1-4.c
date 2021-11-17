@@ -8,7 +8,7 @@
 #include "sysctl.h"
 
 
-//È«¾Ö±äÁ¿
+//å…¨å±€å˜é‡
 uint32_t ui32SysClock;
 
 void S800_Clock_Init(void);
@@ -22,15 +22,15 @@ int main(void)
 	S800_Clock_Init();
 	S800_GPIO_Init();
 	
-	//Ä£Äâ²½½øµç»ú£¬PF3~0Ë³Ê±Õë×ª£¬PF0~3ÄæÊ±ÖÓ×ª
+	//æ¨¡æ‹Ÿæ­¥è¿›ç”µæœºï¼ŒPF3~0é¡ºæ—¶é’ˆè½¬ï¼ŒPF0~3é€†æ—¶é’Ÿè½¬
 	while(1)
 	{
-		//Ë³Ê±Õë
+		//é¡ºæ—¶é’ˆ
 		for (i = 0;i < 512;i++)
 		{		
-			//°ËÅÄ¿ØÖÆ
+			//å…«æ‹æ§åˆ¶
 			GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, GPIO_PIN_3);	// D
-			SysCtlDelay(5*ui32SysClock/3000); //ÑÓÊ±5ms
+			SysCtlDelay(5*ui32SysClock/3000); //å»¶æ—¶5ms
 			GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);	// DC
 			SysCtlDelay(5*ui32SysClock/3000);
 			GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, 0x0);			// C
@@ -48,14 +48,14 @@ int main(void)
 			GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0x0);
 			GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, 0x0);
 		}
-		SysCtlDelay(ui32SysClock); // ÔİÍ£3Ãë
+		SysCtlDelay(ui32SysClock); // æš‚åœ3ç§’
 		
-		//ÄæÊ±Õë
+		//é€†æ—¶é’ˆ
 		for (i = 0;i < 512;i++)
 		{		
-			//°ËÅÄ
+			//å…«æ‹
 			GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, GPIO_PIN_0);	// A
-			SysCtlDelay(5*ui32SysClock/3000); //ÑÓÊ±5ms
+			SysCtlDelay(5*ui32SysClock/3000); //å»¶æ—¶5ms
 			GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);	// AB
 			SysCtlDelay(5*ui32SysClock/3000);
 			GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0x0);			// B
@@ -73,7 +73,7 @@ int main(void)
 			GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0x0);
 			GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, 0x0);
 		}
-		SysCtlDelay(ui32SysClock); // ÔİÍ£3Ãë
+		SysCtlDelay(ui32SysClock); // æš‚åœ3ç§’
 	}
 }
 
