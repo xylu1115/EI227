@@ -60,8 +60,8 @@ uint32_t ui32SysClock;
 uint8_t seg7[] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x77,0x7c,0x58,0x5e,0x079,0x71,0x5c};
 
 //systick software counter define
-volatile uint16_t systick_10ms_couter=0, systick_100ms_couter=0; //10msºÍ100ms¼ÆÊ±Æ÷
-volatile uint8_t	systick_10ms_status=0, systick_100ms_status=0; //10msºÍ100ms¼ÆÊ±×´Ì¬
+volatile uint16_t systick_10ms_couter=0, systick_100ms_couter=0; //10mså’Œ100msè®¡æ—¶å™¨
+volatile uint8_t	systick_10ms_status=0, systick_100ms_status=0; //10mså’Œ100msè®¡æ—¶çŠ¶æ€
 
 uint32_t ui32IntPriorityGroup, ui32IntPriorityMask;
 uint32_t ui32IntPrioritySystick, ui32IntPriorityUart0;
@@ -73,7 +73,7 @@ int main(void)
 	volatile uint8_t cnt=0; 
 	volatile uint16_t	i2c_flash_cnt=0, gpio_flash_cnt=0;
 
-	IntMasterDisable();	//¹ØÖĞ¶Ï
+	IntMasterDisable();	//å…³ä¸­æ–­
 
 	S800_Clock_Init();
 	S800_GPIO_Init();
@@ -86,18 +86,18 @@ int main(void)
 	
 	IntPriorityGroupingSet(7);			//Set all priority to pre-emtption priority
 	IntPrioritySet(INT_UART0,0x3);		//Set INT_UART0 to highest priority
-	IntPrioritySet(FAULT_SYSTICK,0x3); 	//ÉèÖÃÓÅÏÈ¼¶ÏàÍ¬
+	IntPrioritySet(FAULT_SYSTICK,0x3); 	//è®¾ç½®ä¼˜å…ˆçº§ç›¸åŒ
 	
 	ui32IntPriorityGroup		= IntPriorityGroupingGet();
 	ui32IntPriorityUart0		= IntPriorityGet(INT_UART0);
 	ui32IntPrioritySystick		= IntPriorityGet(FAULT_SYSTICK);
 
-	IntMasterEnable();	//¿ªÖĞ¶Ï	
+	IntMasterEnable();	//å¼€ä¸­æ–­	
 	
 	while (1)
 	{
-		//ÈÎÎñ1£ºÊıÂë¹Ü¡¢LED×ßÂíµÆ
-		if (systick_100ms_status) //100ms¶¨Ê±µ½
+		//ä»»åŠ¡1ï¼šæ•°ç ç®¡ã€LEDèµ°é©¬ç¯
+		if (systick_100ms_status) //100mså®šæ—¶åˆ°
 		{
 			systick_100ms_status = 0; //reset 100ms timer
 			
@@ -105,10 +105,10 @@ int main(void)
 			{
 				i2c_flash_cnt = 0;
 
-				//ÊıÂë¹Ü×ßÂíµÆ
+				//æ•°ç ç®¡èµ°é©¬ç¯
 				result = I2C0_WriteByte(TCA6424_I2CADDR,TCA6424_OUTPUT_PORT1,seg7[cnt+1]);	//write port 1 				
 				result = I2C0_WriteByte(TCA6424_I2CADDR,TCA6424_OUTPUT_PORT2,1<<cnt);	//write port 2
-				//LED×ßÂíµÆ
+				//LEDèµ°é©¬ç¯
 				result = I2C0_WriteByte(PCA9557_I2CADDR,PCA9557_OUTPUT,~(1<<cnt));	
 
 				cnt = (cnt+1) % 8;
@@ -195,21 +195,21 @@ uint8_t I2C0_ReadByte(uint8_t DevAddr, uint8_t RegAddr)
 {
 	uint8_t value;
 	
-	while(I2CMasterBusy(I2C0_BASE)){};	//Ã¦µÈ´ı
-	I2CMasterSlaveAddrSet(I2C0_BASE, DevAddr, false); //Éè´Ó»úµØÖ·£¬Ğ´
-	I2CMasterDataPut(I2C0_BASE, RegAddr); //ÉèÊı¾İµØÖ·
-	I2CMasterControl(I2C0_BASE,I2C_MASTER_CMD_SINGLE_SEND); //Æô¶¯×ÜÏß·¢ËÍ
+	while(I2CMasterBusy(I2C0_BASE)){};	//å¿™ç­‰å¾…
+	I2CMasterSlaveAddrSet(I2C0_BASE, DevAddr, false); //è®¾ä»æœºåœ°å€ï¼Œå†™
+	I2CMasterDataPut(I2C0_BASE, RegAddr); //è®¾æ•°æ®åœ°å€
+	I2CMasterControl(I2C0_BASE,I2C_MASTER_CMD_SINGLE_SEND); //å¯åŠ¨æ€»çº¿å‘é€
 	while(I2CMasterBusBusy(I2C0_BASE));
 	if (I2CMasterErr(I2C0_BASE) != I2C_MASTER_ERR_NONE)
-		return 0; //´íÎó
+		return 0; //é”™è¯¯
 	Delay(100);
 
 	//receive data
-	I2CMasterSlaveAddrSet(I2C0_BASE, DevAddr, true); //Éè´Ó»úµØÖ·£¬¶Á
-	I2CMasterControl(I2C0_BASE,I2C_MASTER_CMD_SINGLE_RECEIVE); //Æô¶¯×ÜÏß½ÓÊÕ
+	I2CMasterSlaveAddrSet(I2C0_BASE, DevAddr, true); //è®¾ä»æœºåœ°å€ï¼Œè¯»
+	I2CMasterControl(I2C0_BASE,I2C_MASTER_CMD_SINGLE_RECEIVE); //å¯åŠ¨æ€»çº¿æ¥æ”¶
 	while(I2CMasterBusBusy(I2C0_BASE));
 	if (I2CMasterErr(I2C0_BASE) != I2C_MASTER_ERR_NONE)
-		return 0; //´íÎó
+		return 0; //é”™è¯¯
 	Delay(100);
 
 	value=I2CMasterDataGet(I2C0_BASE);
@@ -237,7 +237,7 @@ void S800_SysTick_Init(void)
 */
 void SysTick_Handler(void)
 {
-	if (systick_100ms_couter == 0) //ÀûÓÃ1msµÄSysTick²úÉú100msµÄ¶¨Ê±Æ÷
+	if (systick_100ms_couter == 0) //åˆ©ç”¨1msçš„SysTickäº§ç”Ÿ100msçš„å®šæ—¶å™¨
 	{
 		systick_100ms_couter = 100;
 		systick_100ms_status = 1;
@@ -245,7 +245,7 @@ void SysTick_Handler(void)
 	else
 		systick_100ms_couter--;
 	
-	if (systick_10ms_couter	== 0) //ÀûÓÃ1msµÄSysTick²úÉú10msµÄ¶¨Ê±Æ÷
+	if (systick_10ms_couter	== 0) //åˆ©ç”¨1msçš„SysTickäº§ç”Ÿ10msçš„å®šæ—¶å™¨
 	{
 		systick_10ms_couter	 = 10;
 		systick_10ms_status  = 1;
@@ -253,14 +253,14 @@ void SysTick_Handler(void)
 	else
 		systick_10ms_couter--;
 	
-	//ÈÎÎñ2£ºµãÁÁD1£¬³¤°´SW1µãÁÁD2£¬ÊÍ·ÅºóÏ¨Ãğ
-	GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1,GPIO_PIN_1);	//µãÁÁPN1£¨D1£©
+	//ä»»åŠ¡2ï¼šç‚¹äº®D1ï¼Œé•¿æŒ‰SW1ç‚¹äº®D2ï¼Œé‡Šæ”¾åç†„ç­
+	GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1,GPIO_PIN_1);	//ç‚¹äº®PN1ï¼ˆD1ï¼‰
 	while (GPIOPinRead(GPIO_PORTJ_BASE,GPIO_PIN_0) == 0)//PJ0(USR_SW1) keep pressed
 	{
 		systick_100ms_status	= systick_10ms_status = 0;
-		GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0,GPIO_PIN_0); //µãÁÁPN0£¨D2£©
+		GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0,GPIO_PIN_0); //ç‚¹äº®PN0ï¼ˆD2ï¼‰
 	}
-	GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0,0);	//Ï¨ÃğPN0	
+	GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0,0);	//ç†„ç­PN0	
 
 }
 
@@ -307,8 +307,8 @@ void UART0_Handler(void)
 
 	UARTIntClear(UART0_BASE, uart0_int_status);							//Clear the asserted interrupts
 
-	//ÈÎÎñ3£ºÏ¨ÃğD1,D2£¬³¤°´SW2±£³Ö½ÓÊÕ×´Ì¬
-	GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0|GPIO_PIN_1,0);	//Ï¨ÃğPN0,PN1
+	//ä»»åŠ¡3ï¼šç†„ç­D1,D2ï¼Œé•¿æŒ‰SW2ä¿æŒæ¥æ”¶çŠ¶æ€
+	GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0|GPIO_PIN_1,0);	//ç†„ç­PN0,PN1
 	while(GPIOPinRead(GPIO_PORTJ_BASE,GPIO_PIN_1) == 0) 	//PJ1(USR_SW2) keep pressed
 	{		
 		while(UARTCharsAvail(UART0_BASE))     								// Loop while there are characters in the receive FIFO.
