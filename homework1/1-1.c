@@ -10,7 +10,7 @@
 #define   FASTFLASHTIME			(uint32_t)500000
 #define   SLOWFLASHTIME			(uint32_t)4000000
 
-//全局变量
+//脠芦戮脰卤盲脕驴
 uint32_t ui32SysClock;
 
 void S800_Clock_Init(void);
