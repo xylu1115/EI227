@@ -57,8 +57,8 @@ uint32_t ui32SysClock;
 uint8_t seg7[] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x77,0x7c,0x58,0x5e,0x079,0x71,0x5c};
 
 //systick software counter define
-volatile uint16_t systick_10ms_couter=0, systick_100ms_couter=0; //10msºÍ100ms¼ÆÊ±Æ÷
-volatile uint8_t	systick_10ms_status=0, systick_100ms_status=0; //10msºÍ100ms¼ÆÊ±×´Ì¬
+volatile uint16_t systick_10ms_couter=0, systick_100ms_couter=0; //10mså’Œ100msè®¡æ—¶å™¨
+volatile uint8_t	systick_10ms_status=0, systick_100ms_status=0; //10mså’Œ100msè®¡æ—¶çŠ¶æ€
 
 int main(void)
 {
@@ -66,7 +66,7 @@ int main(void)
 	volatile uint16_t	i2c_flash_cnt=0;
 	char uart_receive_char;
 
-	IntMasterDisable();	//¹ØÖĞ¶Ï
+	IntMasterDisable();	//å…³ä¸­æ–­
 
 	S800_Clock_Init();
 	S800_GPIO_Init();
@@ -74,7 +74,7 @@ int main(void)
 	S800_SysTick_Init();
 	S800_UART_Init();
 	
-	IntMasterEnable();	//¿ªÖĞ¶Ï	
+	IntMasterEnable();	//å¼€ä¸­æ–­	
 
 	while (1)
 	{
@@ -85,24 +85,24 @@ int main(void)
 			uart_receive_char = UARTCharGet(UART0_BASE);
 			if (uart_receive_char <= 'z' && uart_receive_char >= 'a')
 			{
-				uart_receive_char -= 'a' - 'A'; // ¸Ä³É´óĞ´
+				uart_receive_char -= 'a' - 'A'; // æ”¹æˆå¤§å†™
 			}
 			UARTCharPut(UART0_BASE, uart_receive_char);
 		}
 
-		//task2: ÅÜÂíµÆ
-		if (systick_100ms_status) //100ms¶¨Ê±µ½
+		//task2: è·‘é©¬ç¯
+		if (systick_100ms_status) //100mså®šæ—¶åˆ°
 		{
-			systick_100ms_status = 0; //ÖØÖÃ100ms¶¨Ê±×´Ì¬
+			systick_100ms_status = 0; //é‡ç½®100mså®šæ—¶çŠ¶æ€
 			
 			if (++i2c_flash_cnt	>= I2C_FLASHTIME/100)  //5*100ms=500ms
 			{
 				i2c_flash_cnt = 0;
 
-				//ÊıÂë¹ÜÅÜÂíµÆ
+				//æ•°ç ç®¡è·‘é©¬ç¯
 				I2C0_WriteByte(TCA6424_I2CADDR,TCA6424_OUTPUT_PORT1,seg7[cnt+1]);	//write port 1 				
 				I2C0_WriteByte(TCA6424_I2CADDR,TCA6424_OUTPUT_PORT2,1<<cnt);				//write port 2
-				//LEDÅÜÂíµÆ
+				//LEDè·‘é©¬ç¯
 				I2C0_WriteByte(PCA9557_I2CADDR,PCA9557_OUTPUT,~(1<<cnt));	
 
 				cnt = (cnt+1) % 8;
@@ -188,22 +188,22 @@ uint8_t I2C0_ReadByte(uint8_t DevAddr, uint8_t RegAddr)
 {
 	uint8_t value;
 
-	while(I2CMasterBusy(I2C0_BASE)){};	//Ã¦µÈ´ı
-	I2CMasterSlaveAddrSet(I2C0_BASE, DevAddr, false); //Éè´Ó»úµØÖ·£¬Ğ´
-	I2CMasterDataPut(I2C0_BASE, RegAddr); //ÉèÊı¾İµØÖ·
-	I2CMasterControl(I2C0_BASE,I2C_MASTER_CMD_SINGLE_SEND); //Æô¶¯×ÜÏß·¢ËÍ
+	while(I2CMasterBusy(I2C0_BASE)){};	//å¿™ç­‰å¾…
+	I2CMasterSlaveAddrSet(I2C0_BASE, DevAddr, false); //è®¾ä»æœºåœ°å€ï¼Œå†™
+	I2CMasterDataPut(I2C0_BASE, RegAddr); //è®¾æ•°æ®åœ°å€
+	I2CMasterControl(I2C0_BASE,I2C_MASTER_CMD_SINGLE_SEND); //å¯åŠ¨æ€»çº¿å‘é€
 	while(I2CMasterBusBusy(I2C0_BASE));
 	if (I2CMasterErr(I2C0_BASE) != I2C_MASTER_ERR_NONE)
-		return 0; //´íÎó
+		return 0; //é”™è¯¯
 	Delay(100);
 
 	//receive data
-	I2CMasterSlaveAddrSet(I2C0_BASE, DevAddr, true); //Éè´Ó»úµØÖ·£¬¶Á
-	I2CMasterControl(I2C0_BASE,I2C_MASTER_CMD_SINGLE_RECEIVE); //Æô¶¯×ÜÏß½ÓÊÕ
+	I2CMasterSlaveAddrSet(I2C0_BASE, DevAddr, true); //è®¾ä»æœºåœ°å€ï¼Œè¯»
+	I2CMasterControl(I2C0_BASE,I2C_MASTER_CMD_SINGLE_RECEIVE); //å¯åŠ¨æ€»çº¿æ¥æ”¶
 	while(I2CMasterBusBusy(I2C0_BASE));
 	value=I2CMasterDataGet(I2C0_BASE);
 	if (I2CMasterErr(I2C0_BASE) != I2C_MASTER_ERR_NONE)
-		return 0; //´íÎó
+		return 0; //é”™è¯¯
 	Delay(100);
 
 	return value;
@@ -229,7 +229,7 @@ void S800_SysTick_Init(void)
 */
 void SysTick_Handler(void)
 {
-	if (systick_100ms_couter == 0) //ÀûÓÃ1msµÄSysTick²úÉú100msµÄ¶¨Ê±Æ÷
+	if (systick_100ms_couter == 0) //åˆ©ç”¨1msçš„SysTickäº§ç”Ÿ100msçš„å®šæ—¶å™¨
 	{
 		systick_100ms_couter = 100;
 		systick_100ms_status = 1;
@@ -237,7 +237,7 @@ void SysTick_Handler(void)
 	else
 		systick_100ms_couter--;
 	
-	if (systick_10ms_couter	== 0) //ÀûÓÃ1msµÄSysTick²úÉú10msµÄ¶¨Ê±Æ÷
+	if (systick_10ms_couter	== 0) //åˆ©ç”¨1msçš„SysTickäº§ç”Ÿ10msçš„å®šæ—¶å™¨
 	{
 		systick_10ms_couter	 = 10;
 		systick_10ms_status  = 1;
